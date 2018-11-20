@@ -279,6 +279,10 @@ public class FlatMessage implements Serializable {
         }
         FlatMessage[] partitionMessages = new FlatMessage[partitionsNum];
         String pk = pkHashConfig.get(flatMessage.getDatabase() + "." + flatMessage.getTable());
+        if (pk == null) {
+            pkHashConfig.get("default");
+        }
+        
         if (pk == null || flatMessage.getIsDdl()) {
             partitionMessages[0] = flatMessage;
         } else {
