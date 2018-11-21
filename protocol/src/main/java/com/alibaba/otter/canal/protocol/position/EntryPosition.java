@@ -144,4 +144,14 @@ public class EntryPosition extends TimePosition {
         return val;
     }
 
+    @Override
+    public String toString() {
+        return "EntryPosition{" +
+                "included=" + included +
+                ", journalName='" + journalName + '\'' +
+                ", position=" + position +
+                ", serverId=" + serverId +
+                ", gtid='" + gtid + '\'' +
+                '}';
+    }
 }
