@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.otter.canal.common.MQProperties;
 import com.alibaba.otter.canal.kafka.CanalKafkaProducer;
-import com.alibaba.otter.canal.rocketmq.CanalRocketMQProducer;
 import com.alibaba.otter.canal.server.CanalMQStarter;
 import com.alibaba.otter.canal.spi.CanalMQProducer;
 
@@ -44,9 +43,6 @@ public class CanalLauncher {
             if (serverMode.equalsIgnoreCase("kafka")) {
                 logger.info("server mode = kafka");
                 canalMQProducer = new CanalKafkaProducer();
-            } else if (serverMode.equalsIgnoreCase("rocketmq")) {
-                logger.info("server mode = rocketmq");
-                canalMQProducer = new CanalRocketMQProducer();
             } else {
                 logger.info("server mode = netty");
             }

@@ -95,16 +95,7 @@ public class CanalAdapterLoader {
                         loadConnector(config, canalOuterAdapters);
                     }
                     canalOuterAdapterGroups.add(canalOuterAdapters);
-                    if (StringUtils.isBlank(topic.getMqMode()) || "rocketmq".equalsIgnoreCase(topic.getMqMode())) {
-                        CanalAdapterRocketMQWorker rocketMQWorker = new CanalAdapterRocketMQWorker(canalClientConfig,
-                            canalClientConfig.getMqServers(),
-                            topic.getTopic(),
-                            group.getGroupId(),
-                            canalOuterAdapterGroups,
-                            canalClientConfig.getFlatMessage());
-                        canalMQWorker.put(topic.getTopic() + "-rocketmq-" + group.getGroupId(), rocketMQWorker);
-                        rocketMQWorker.start();
-                    } else if ("kafka".equalsIgnoreCase(topic.getMqMode())) {
+                    if ("kafka".equalsIgnoreCase(topic.getMqMode())) {
                         CanalAdapterKafkaWorker canalKafkaWorker = new CanalAdapterKafkaWorker(canalClientConfig,
                             canalClientConfig.getMqServers(),
                             topic.getTopic(),
