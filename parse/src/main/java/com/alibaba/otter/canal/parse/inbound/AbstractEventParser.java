@@ -196,7 +196,7 @@ public abstract class AbstractEventParser<EVENT> extends AbstractCanalLifeCycle 
                         long end = System.currentTimeMillis();
                         logger.warn("---> find start position successfully, {}", startPosition.toString() + " cost : "
                                                                                  + (end - start)
-                                                                                 + "ms , the next step is binlog dump");
+                                                                                 + "ms , the next step is binlog dump " + startPosition.getJournalName());
                         // 重新链接，因为在找position过程中可能有状态，需要断开后重建
                         erosaConnection.reconnect();
 
