@@ -42,9 +42,13 @@ public class CanalLauncher {
             CanalMQProducer canalMQProducer = null;
             String serverMode = CanalController.getProperty(properties, CanalConstants.CANAL_SERVER_MODE);
             if (serverMode.equalsIgnoreCase("kafka")) {
+                logger.info("server mode = kafka");
                 canalMQProducer = new CanalKafkaProducer();
             } else if (serverMode.equalsIgnoreCase("rocketmq")) {
+                logger.info("server mode = rocketmq");
                 canalMQProducer = new CanalRocketMQProducer();
+            } else {
+                logger.info("server mode = netty");
             }
 
             if (canalMQProducer != null) {
