@@ -3,6 +3,8 @@ package com.taobao.tddl.dbsync.binlog.event;
 import java.io.IOException;
 
 import com.taobao.tddl.dbsync.binlog.LogBuffer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * For binlog version 4. This event is saved by threads which read it, as they
@@ -13,6 +15,7 @@ import com.taobao.tddl.dbsync.binlog.LogBuffer;
  * @version 1.0
  */
 public final class FormatDescriptionLogEvent extends StartLogEventV3 {
+    private Log logger = LogFactory.getLog(this.getClass());
 
     /**
      * The number of types we handle in Format_description_log_event
