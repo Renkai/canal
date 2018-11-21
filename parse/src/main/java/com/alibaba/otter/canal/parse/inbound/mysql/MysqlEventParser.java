@@ -646,7 +646,9 @@ public class MysqlEventParser extends AbstractMysqlEventParser implements CanalE
      */
     private EntryPosition findEndPosition(MysqlConnection mysqlConnection) {
         try {
+            logger.info("find end position");
             ResultSetPacket packet = mysqlConnection.query("show master status");
+            logger.info("got fields");
             List<String> fields = packet.getFieldValues();
             if (CollectionUtils.isEmpty(fields)) {
                 throw new CanalParseException("command : 'show master status' has an error! pls check. you need (at least one of) the SUPER,REPLICATION CLIENT privilege(s) for this operation");
