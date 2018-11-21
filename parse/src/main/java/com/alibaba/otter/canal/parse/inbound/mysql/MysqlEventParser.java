@@ -381,8 +381,11 @@ public class MysqlEventParser extends AbstractMysqlEventParser implements CanalE
     }
 
     protected EntryPosition findEndPositionWithMasterIdAndTimestamp(MysqlConnection connection) {
+        logger.info("prepare connection");
         MysqlConnection mysqlConnection = (MysqlConnection) connection;
+        logger.info("prepare connection done");
         final EntryPosition endPosition = findEndPosition(mysqlConnection);
+        logger.info("return end position");
         if (tableMetaTSDB != null) {
             long startTimestamp = System.currentTimeMillis();
             return findAsPerTimestampInSpecificLogFile(mysqlConnection,
