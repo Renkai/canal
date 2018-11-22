@@ -21,21 +21,21 @@ import com.alibaba.otter.canal.spi.CanalMQProducer;
 
 public class CanalMQStarter {
 
-    private static final Logger          logger       = LoggerFactory.getLogger(CanalMQStarter.class);
+    private static final Logger logger = LoggerFactory.getLogger(CanalMQStarter.class);
 
-    private volatile boolean             running      = false;
+    private volatile boolean running = false;
 
-    private ExecutorService              executorService;
+    private ExecutorService executorService;
 
-    private CanalMQProducer              canalMQProducer;
+    private CanalMQProducer canalMQProducer;
 
-    private MQProperties                 properties;
+    private MQProperties properties;
 
-    private CanalServerWithEmbedded      canalServer;
+    private CanalServerWithEmbedded canalServer;
 
     private Map<String, CanalMQRunnable> canalMQWorks = new ConcurrentHashMap<>();
 
-    public CanalMQStarter(CanalMQProducer canalMQProducer){
+    public CanalMQStarter(CanalMQProducer canalMQProducer) {
         this.canalMQProducer = canalMQProducer;
     }
 
@@ -135,17 +135,20 @@ public class CanalMQStarter {
                 int getBatchSize = properties.getCanalBatchSize();
                 while (running && destinationRunning.get()) {
                     Message message;
+                    logger.info("before get");
                     if (getTimeout != null && getTimeout > 0) {
                         message = canalServer
-                            .getWithoutAck(clientIdentity, getBatchSize, getTimeout, TimeUnit.MILLISECONDS);
+                                .getWithoutAck(clientIdentity, getBatchSize, getTimeout, TimeUnit.MILLISECONDS);
                     } else {
                         message = canalServer.getWithoutAck(clientIdentity, getBatchSize);
                     }
+                    logger.info("after get");
 
                     final long batchId = message.getId();
                     try {
                         int size = message.isRaw() ? message.getRawEntries().size() : message.getEntries().size();
                         if (batchId != -1 && size != 0) {
+                            logger.info("before send");
                             canalMQProducer.send(destination, message, new CanalKafkaProducer.Callback() {
 
                                 @Override
@@ -158,9 +161,11 @@ public class CanalMQStarter {
                                     canalServer.rollback(clientIdentity, batchId);
                                 }
                             }); // 发送message到topic
+                            logger.info("after send");
                         } else {
                             try {
                                 Thread.sleep(100);
+                                logger.info("sleep batchId: {} size: {}", batchId, size);
                             } catch (InterruptedException e) {
                                 // ignore
                             }
@@ -180,7 +185,7 @@ public class CanalMQStarter {
 
         private CanalInstance canalInstance;
 
-        public CanalMQRunnable(CanalInstance canalInstance){
+        public CanalMQRunnable(CanalInstance canalInstance) {
             this.canalInstance = canalInstance;
         }
 
