@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.protobuf.ByteString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author machengyuan 2018-9-13 下午10:31:14
@@ -32,7 +34,7 @@ public class FlatMessage implements Serializable {
     private Map<String, String>       mysqlType;
     private List<Map<String, String>> data;
     private List<Map<String, String>> old;
-
+    private static Logger logger = LoggerFactory.getLogger(FlatMessage.class);
     public FlatMessage(){
     }
 
@@ -279,6 +281,7 @@ public class FlatMessage implements Serializable {
         }
         FlatMessage[] partitionMessages = new FlatMessage[partitionsNum];
         String pk = pkHashConfig.get(flatMessage.getDatabase() + "." + flatMessage.getTable());
+        if(pk == null) pk = "id";
         if (pk == null || flatMessage.getIsDdl()) {
             partitionMessages[0] = flatMessage;
         } else {
@@ -300,7 +303,7 @@ public class FlatMessage implements Serializable {
                     int pkHash = Math.abs(hash) % partitionsNum;
                     // math.abs可能返回负值，这里再取反，把出现负值的数据还是写到固定的分区，仍然可以保证消费顺序
                     pkHash = Math.abs(pkHash);
-
+                    logger.info("pk: {},hash: {}",pk,pkHash);
                     FlatMessage flatMessageTmp = partitionMessages[pkHash];
                     if (flatMessageTmp == null) {
                         flatMessageTmp = new FlatMessage(flatMessage.getId());

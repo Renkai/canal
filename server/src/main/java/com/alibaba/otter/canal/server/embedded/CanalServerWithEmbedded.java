@@ -423,8 +423,8 @@ public class CanalServerWithEmbedded extends AbstractCanalLifeCycle implements C
         // 更新cursor
         if (positionRanges.getAck() != null) {
             canalInstance.getMetaManager().updateCursor(clientIdentity, positionRanges.getAck());
-            if (logger.isInfoEnabled()) {
-                logger.info("ack successfully, clientId:{} batchId:{} position:{}",
+            if (logger.isDebugEnabled()) {
+                logger.debug("ack successfully, clientId:{} batchId:{} position:{}",
                     clientIdentity.getClientId(),
                     batchId,
                     positionRanges);
