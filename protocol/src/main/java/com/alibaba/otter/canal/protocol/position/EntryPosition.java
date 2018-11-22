@@ -48,12 +48,17 @@ public class EntryPosition extends TimePosition {
     }
 
     public static String prettyJournalName(String nonPrettyJournalName) {
+        String tmp = nonPrettyJournalName.replaceAll("[^\\x00-\\x7F]", "");
+        tmp = tmp.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
+        tmp = tmp.replaceAll("\\p{C}", "");
+        tmp.trim();
         try {
-            Matcher matcher = filePattern.matcher(nonPrettyJournalName);
+            Matcher matcher = filePattern.matcher(tmp);
             matcher.matches();
             return matcher.group(1);
         } catch (Exception e) {
             logger.error("name not match: " + nonPrettyJournalName);
+            logger.error("name not match: " + tmp);
             return "";
         }
     }
@@ -166,7 +171,7 @@ public class EntryPosition extends TimePosition {
     }
 
     public static void main(String[] args) {
-        String hehe = prettyJournalName("mysql-bin-changelog.016997asdfasf");
+        String hehe = prettyJournalName("mysql-bin-changelog.017003<83>^M<8b>ÿ");
         System.out.printf(hehe);
     }
 }
