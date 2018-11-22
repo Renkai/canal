@@ -38,7 +38,7 @@ public class EntryPosition extends TimePosition {
         super(timestamp);
         this.journalName = prettyJournalName(journalName);
         if (!journalName.equals(this.journalName)) {
-            logger.info("got journal name {} but we use {}", journalName, this.journalName);
+            logger.debug("got journal name {} but we use {}", journalName, this.journalName);
         }
         this.position = position;
     }
