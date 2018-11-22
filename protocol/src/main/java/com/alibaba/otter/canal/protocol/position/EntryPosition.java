@@ -8,33 +8,33 @@ import java.util.regex.Pattern;
 
 /**
  * 数据库对象的唯一标示
- * 
+ *
  * @author jianghang 2012-6-14 下午09:20:07
  * @version 1.0.0
  */
 public class EntryPosition extends TimePosition {
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    static Logger logger = LoggerFactory.getLogger(EntryPosition.class);
     private static final long serialVersionUID = 81432665066427482L;
     public static final int EVENTIDENTITY_SEGMENT = 3;
     public static final char EVENTIDENTITY_SPLIT = (char) 5;
 
-    private boolean           included              = false;
-    private String            journalName;
-    private Long              position;
+    private boolean included = false;
+    private String journalName;
+    private Long position;
     // add by agapple at 2016-06-28
     private Long serverId = null;              // 记录一下位点对应的serverId
     private String gtid = null;
     private static Pattern filePattern = Pattern.compile("([^.]*\\.\\d+).*");
 
-    public EntryPosition(){
+    public EntryPosition() {
         super(null);
     }
 
-    public EntryPosition(Long timestamp){
+    public EntryPosition(Long timestamp) {
         this(null, null, timestamp);
     }
 
-    public EntryPosition(String journalName, Long position){
+    public EntryPosition(String journalName, Long position) {
         this(journalName, position, null);
     }
 
@@ -48,9 +48,14 @@ public class EntryPosition extends TimePosition {
     }
 
     public static String prettyJournalName(String nonPrettyJournalName) {
-        Matcher matcher = filePattern.matcher(nonPrettyJournalName);
-        matcher.matches();
-        return matcher.group(1);
+        try {
+            Matcher matcher = filePattern.matcher(nonPrettyJournalName);
+            matcher.matches();
+            return matcher.group(1);
+        } catch (Exception e) {
+            logger.error("name not match: " + nonPrettyJournalName);
+            throw e;
+        }
     }
 
     public EntryPosition(String journalName, Long position, Long timestamp, Long serverId) {
@@ -148,7 +153,7 @@ public class EntryPosition extends TimePosition {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(EntryPosition o) {
@@ -161,7 +166,7 @@ public class EntryPosition extends TimePosition {
     }
 
     public static void main(String[] args) {
-        String hehe = prettyJournalName("sdfa.232 jjj");
+        String hehe = prettyJournalName("mysql-bin-changelog.016997asdfasf");
         System.out.printf(hehe);
     }
 }
