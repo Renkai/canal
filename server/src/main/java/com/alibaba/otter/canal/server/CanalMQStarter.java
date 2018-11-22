@@ -135,14 +135,12 @@ public class CanalMQStarter {
                 int getBatchSize = properties.getCanalBatchSize();
                 while (running && destinationRunning.get()) {
                     Message message;
-                    logger.info("before get");
                     if (getTimeout != null && getTimeout > 0) {
                         message = canalServer
                                 .getWithoutAck(clientIdentity, getBatchSize, getTimeout, TimeUnit.MILLISECONDS);
                     } else {
                         message = canalServer.getWithoutAck(clientIdentity, getBatchSize);
                     }
-                    logger.info("after get");
 
                     final long batchId = message.getId();
                     try {

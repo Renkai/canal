@@ -246,22 +246,7 @@ public class CanalServerWithEmbedded extends AbstractCanalLifeCycle implements C
                 // 记录到流式信息
                 Long batchId = canalInstance.getMetaManager().addBatch(clientIdentity, events.getPositionRange());
                 boolean raw = isRaw(canalInstance.getEventStore());
-                List entrys = null;
-                if (raw) {
-                    entrys = Lists.transform(events.getEvents(), new Function<Event, ByteString>() {
-
-                        public ByteString apply(Event input) {
-                            return input.getRawEntry();
-                        }
-                    });
-                } else {
-                    entrys = Lists.transform(events.getEvents(), new Function<Event, CanalEntry.Entry>() {
-
-                        public CanalEntry.Entry apply(Event input) {
-                            return input.getEntry();
-                        }
-                    });
-                }
+                List entrys = getList(events, raw);
                 if (logger.isInfoEnabled()) {
                     logger.info("get successfully, clientId:{} batchSize:{} real size is {} and result is [batchId:{} , position:{}]",
                         clientIdentity.getClientId(),
@@ -339,21 +324,7 @@ public class CanalServerWithEmbedded extends AbstractCanalLifeCycle implements C
                 Long batchId = canalInstance.getMetaManager().addBatch(clientIdentity, events.getPositionRange());
                 boolean raw = isRaw(canalInstance.getEventStore());
                 List entrys = null;
-                if (raw) {
-                    entrys = Lists.transform(events.getEvents(), new Function<Event, ByteString>() {
-
-                        public ByteString apply(Event input) {
-                            return input.getRawEntry();
-                        }
-                    });
-                } else {
-                    entrys = Lists.transform(events.getEvents(), new Function<Event, CanalEntry.Entry>() {
-
-                        public CanalEntry.Entry apply(Event input) {
-                            return input.getEntry();
-                        }
-                    });
-                }
+                entrys = getList(events, raw);
                 if (logger.isInfoEnabled()) {
                     logger.info("getWithoutAck successfully, clientId:{} batchSize:{}  real size is {} and result is [batchId:{} , position:{}]",
                         clientIdentity.getClientId(),
@@ -366,6 +337,26 @@ public class CanalServerWithEmbedded extends AbstractCanalLifeCycle implements C
             }
 
         }
+    }
+
+    private List getList(Events<Event> events, boolean raw) {
+        List entrys;
+        if (raw) {
+            entrys = Lists.transform(events.getEvents(), new Function<Event, ByteString>() {
+
+                public ByteString apply(Event input) {
+                    return input.getRawEntry();
+                }
+            });
+        } else {
+            entrys = Lists.transform(events.getEvents(), new Function<Event, CanalEntry.Entry>() {
+
+                public CanalEntry.Entry apply(Event input) {
+                    return input.getEntry();
+                }
+            });
+        }
+        return entrys;
     }
 
     /**
