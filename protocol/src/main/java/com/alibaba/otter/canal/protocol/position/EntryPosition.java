@@ -54,7 +54,7 @@ public class EntryPosition extends TimePosition {
             return matcher.group(1);
         } catch (Exception e) {
             logger.error("name not match: " + nonPrettyJournalName);
-            throw e;
+            return "";
         }
     }
 
