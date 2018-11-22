@@ -3,6 +3,7 @@ package com.alibaba.otter.canal.protocol.position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -23,7 +24,7 @@ public class EntryPosition extends TimePosition {
     // add by agapple at 2016-06-28
     private Long serverId = null;              // 记录一下位点对应的serverId
     private String gtid = null;
-    private Pattern filePattern = Pattern.compile("[^.]*\\.\\d+");
+    private static Pattern filePattern = Pattern.compile("([^.]*\\.\\d+).*");
 
     public EntryPosition(){
         super(null);
@@ -46,8 +47,10 @@ public class EntryPosition extends TimePosition {
         this.position = position;
     }
 
-    public String prettyJournalName(String nonPrettyJournalName) {
-        return filePattern.matcher(nonPrettyJournalName).group();
+    public static String prettyJournalName(String nonPrettyJournalName) {
+        Matcher matcher = filePattern.matcher(nonPrettyJournalName);
+        matcher.matches();
+        return matcher.group(1);
     }
 
     public EntryPosition(String journalName, Long position, Long timestamp, Long serverId) {
@@ -157,4 +160,8 @@ public class EntryPosition extends TimePosition {
         return val;
     }
 
+    public static void main(String[] args) {
+        String hehe = prettyJournalName("sdfa.232 jjj");
+        System.out.printf(hehe);
+    }
 }
