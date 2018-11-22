@@ -78,6 +78,7 @@ public class CanalKafkaProducer implements CanalMQProducer {
         // producer.beginTransaction();
         if (!kafkaProperties.getFlatMessage()) {
             try {
+                logger.info("not flat message");
                 ProducerRecord<String, Message> record;
                 if (canalDestination.getPartition() != null) {
                     record = new ProducerRecord<String, Message>(canalDestination.getTopic(),
@@ -96,6 +97,7 @@ public class CanalKafkaProducer implements CanalMQProducer {
                 return;
             }
         } else {
+            logger.info("flat message");
             // 发送扁平数据json
             List<FlatMessage> flatMessages = FlatMessage.messageConverter(message);
             if (flatMessages != null) {
@@ -157,7 +159,9 @@ public class CanalKafkaProducer implements CanalMQProducer {
         }
 
         // producer.commitTransaction();
+        logger.info("before callback");
         callback.commit();
+        logger.info("after callback");
         if (logger.isDebugEnabled()) {
             logger.debug("send message to kafka topic: {}", canalDestination.getTopic());
         }
