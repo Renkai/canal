@@ -326,7 +326,7 @@ public class FlatMessage implements Serializable {
                         flatMessageTmp.setData(data);
                     }
                     data.add(row);
-                    if (flatMessage.getOld() != null && !flatMessage.getOld().isEmpty()) {
+                    if (flatMessage.getOld() != null && !flatMessage.getOld().isEmpty() && flatMessage.getOld().size() > idx) {
                         List<Map<String, String>> old = flatMessageTmp.getOld();
                         if (old == null) {
                             old = new ArrayList<>();
