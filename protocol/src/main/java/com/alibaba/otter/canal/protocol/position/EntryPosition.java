@@ -1,5 +1,10 @@
 package com.alibaba.otter.canal.protocol.position;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.regex.Pattern;
+
 /**
  * 数据库对象的唯一标示
  * 
@@ -7,17 +12,18 @@ package com.alibaba.otter.canal.protocol.position;
  * @version 1.0.0
  */
 public class EntryPosition extends TimePosition {
-
-    private static final long serialVersionUID      = 81432665066427482L;
-    public static final int   EVENTIDENTITY_SEGMENT = 3;
-    public static final char  EVENTIDENTITY_SPLIT   = (char) 5;
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private static final long serialVersionUID = 81432665066427482L;
+    public static final int EVENTIDENTITY_SEGMENT = 3;
+    public static final char EVENTIDENTITY_SPLIT = (char) 5;
 
     private boolean           included              = false;
     private String            journalName;
     private Long              position;
     // add by agapple at 2016-06-28
-    private Long              serverId              = null;              // 记录一下位点对应的serverId
-    private String            gtid                  = null;
+    private Long serverId = null;              // 记录一下位点对应的serverId
+    private String gtid = null;
+    private Pattern filePattern = Pattern.compile("[^.]*\\.\\d+");
 
     public EntryPosition(){
         super(null);
@@ -31,13 +37,20 @@ public class EntryPosition extends TimePosition {
         this(journalName, position, null);
     }
 
-    public EntryPosition(String journalName, Long position, Long timestamp){
+    public EntryPosition(String journalName, Long position, Long timestamp) {
         super(timestamp);
-        this.journalName = journalName;
+        this.journalName = prettyJournalName(journalName);
+        if (!journalName.equals(this.journalName)) {
+            logger.debug("got journal name {} but we use {}", journalName, this.journalName);
+        }
         this.position = position;
     }
 
-    public EntryPosition(String journalName, Long position, Long timestamp, Long serverId){
+    public String prettyJournalName(String nonPrettyJournalName) {
+        return filePattern.matcher(nonPrettyJournalName).group();
+    }
+
+    public EntryPosition(String journalName, Long position, Long timestamp, Long serverId) {
         this(journalName, position, timestamp);
         this.serverId = serverId;
     }
@@ -47,7 +60,7 @@ public class EntryPosition extends TimePosition {
     }
 
     public void setJournalName(String journalName) {
-        this.journalName = journalName;
+        this.journalName = prettyJournalName(journalName);
     }
 
     public Long getPosition() {
