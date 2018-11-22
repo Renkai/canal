@@ -1,12 +1,7 @@
 package com.alibaba.otter.canal.protocol;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.google.protobuf.ByteString;
 import org.slf4j.Logger;
@@ -18,27 +13,28 @@ import org.slf4j.LoggerFactory;
  */
 public class FlatMessage implements Serializable {
 
-    private static final long         serialVersionUID = -3386650678735860050L;
+    private static final long serialVersionUID = -3386650678735860050L;
 
-    private long                      id;
-    private String                    database;
-    private String                    table;
-    private Boolean                   isDdl;
-    private String                    type;
+    private long id;
+    private String database;
+    private String table;
+    private Boolean isDdl;
+    private String type;
     // binlog executeTime
-    private Long                      es;
+    private Long es;
     // dml build timeStamp
-    private Long                      ts;
-    private String                    sql;
-    private Map<String, Integer>      sqlType;
-    private Map<String, String>       mysqlType;
+    private Long ts;
+    private String sql;
+    private Map<String, Integer> sqlType;
+    private Map<String, String> mysqlType;
     private List<Map<String, String>> data;
     private List<Map<String, String>> old;
     private static Logger logger = LoggerFactory.getLogger(FlatMessage.class);
-    public FlatMessage(){
+
+    public FlatMessage() {
     }
 
-    public FlatMessage(long id){
+    public FlatMessage(long id) {
         this.id = id;
     }
 
@@ -123,7 +119,9 @@ public class FlatMessage implements Serializable {
     }
 
     public List<Map<String, String>> getOld() {
-        return old;
+        if (old != null)
+            return old;
+        else return Arrays.asList();
     }
 
     public void setOld(List<Map<String, String>> old) {
@@ -140,7 +138,7 @@ public class FlatMessage implements Serializable {
 
     /**
      * 将Message转换为FlatMessage
-     * 
+     *
      * @param message 原生message
      * @return FlatMessage列表
      */
@@ -165,7 +163,7 @@ public class FlatMessage implements Serializable {
 
             for (CanalEntry.Entry entry : entrys) {
                 if (entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONBEGIN
-                    || entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) {
+                        || entry.getEntryType() == CanalEntry.EntryType.TRANSACTIONEND) {
                     continue;
                 }
 
@@ -174,8 +172,8 @@ public class FlatMessage implements Serializable {
                     rowChange = CanalEntry.RowChange.parseFrom(entry.getStoreValue());
                 } catch (Exception e) {
                     throw new RuntimeException(
-                        "ERROR ## parser of eromanga-event has an error , data:" + entry.toString(),
-                        e);
+                            "ERROR ## parser of eromanga-event has an error , data:" + entry.toString(),
+                            e);
                 }
 
                 CanalEntry.EventType eventType = rowChange.getEventType();
@@ -199,7 +197,7 @@ public class FlatMessage implements Serializable {
                     Set<String> updateSet = new HashSet<>();
                     for (CanalEntry.RowData rowData : rowChange.getRowDatasList()) {
                         if (eventType != CanalEntry.EventType.INSERT && eventType != CanalEntry.EventType.UPDATE
-                            && eventType != CanalEntry.EventType.DELETE) {
+                                && eventType != CanalEntry.EventType.DELETE) {
                             continue;
                         }
 
@@ -268,10 +266,10 @@ public class FlatMessage implements Serializable {
 
     /**
      * 将FlatMessage按指定的字段值hash拆分
-     * 
-     * @param flatMessage flatMessage
+     *
+     * @param flatMessage   flatMessage
      * @param partitionsNum 分区数量
-     * @param pkHashConfig hash映射
+     * @param pkHashConfig  hash映射
      * @return 拆分后的flatMessage数组
      */
     public static FlatMessage[] messagePartition(FlatMessage flatMessage, Integer partitionsNum,
@@ -281,14 +279,18 @@ public class FlatMessage implements Serializable {
         }
         FlatMessage[] partitionMessages = new FlatMessage[partitionsNum];
         String pk = pkHashConfig.get(flatMessage.getDatabase() + "." + flatMessage.getTable());
-        if(pk == null) pk = "id";
+        if (pk == null) pk = "id";
         if (pk == null || flatMessage.getIsDdl()) {
             partitionMessages[0] = flatMessage;
         } else {
             if (flatMessage.getData() != null) {
                 int idx = 0;
                 for (Map<String, String> row : flatMessage.getData()) {
-                    Map<String, String> o = flatMessage.getOld().get(idx);
+                    Map<String, String> o = null;
+                    List<Map<String, String>> oldList = flatMessage.getOld();
+                    if (oldList.size() > idx)
+                        o = oldList.get(idx);
+
                     String value;
                     // 如果old中有pk值说明主键有修改, 以旧的主键值hash为准
                     if (o != null && o.containsKey(pk)) {
@@ -303,7 +305,7 @@ public class FlatMessage implements Serializable {
                     int pkHash = Math.abs(hash) % partitionsNum;
                     // math.abs可能返回负值，这里再取反，把出现负值的数据还是写到固定的分区，仍然可以保证消费顺序
                     pkHash = Math.abs(pkHash);
-                    logger.info("pk: {},hash: {}",pk,pkHash);
+                    logger.info("pk: {},hash: {}", pk, pkHash);
                     FlatMessage flatMessageTmp = partitionMessages[pkHash];
                     if (flatMessageTmp == null) {
                         flatMessageTmp = new FlatMessage(flatMessage.getId());
@@ -342,7 +344,7 @@ public class FlatMessage implements Serializable {
     @Override
     public String toString() {
         return "FlatMessage [id=" + id + ", database=" + database + ", table=" + table + ", isDdl=" + isDdl + ", type="
-               + type + ", es=" + es + ", ts=" + ts + ", sql=" + sql + ", sqlType=" + sqlType + ", mysqlType="
-               + mysqlType + ", data=" + data + ", old=" + old + "]";
+                + type + ", es=" + es + ", ts=" + ts + ", sql=" + sql + ", sqlType=" + sqlType + ", mysqlType="
+                + mysqlType + ", data=" + data + ", old=" + old + "]";
     }
 }
