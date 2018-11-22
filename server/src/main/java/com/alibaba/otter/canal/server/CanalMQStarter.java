@@ -162,7 +162,7 @@ public class CanalMQStarter {
                             logger.info("after send");
                         } else {
                             try {
-                                Thread.sleep(100);
+                                Thread.sleep(1000);
                                 logger.info("sleep batchId: {} size: {}", batchId, size);
                             } catch (InterruptedException e) {
                                 // ignore

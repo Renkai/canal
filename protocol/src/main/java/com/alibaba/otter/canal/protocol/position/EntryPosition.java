@@ -3,6 +3,8 @@ package com.alibaba.otter.canal.protocol.position;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.regex.Pattern;
+
 /**
  * 数据库对象的唯一标示
  *
@@ -21,6 +23,7 @@ public class EntryPosition extends TimePosition {
     // add by agapple at 2016-06-28
     private Long serverId = null;              // 记录一下位点对应的serverId
     private String gtid = null;
+    Pattern filePattern = Pattern.compile("[^.]*\\.\\d+");
 
     public EntryPosition() {
         super(null);
@@ -44,13 +47,7 @@ public class EntryPosition extends TimePosition {
     }
 
     public String prettyJournalName(String nonPrettyJournalName) {
-        int maxi = 0;
-        for (int i = 0; i < nonPrettyJournalName.length(); i++) {
-            if (nonPrettyJournalName.charAt(i) >= '0' && nonPrettyJournalName.charAt(i) <= '9') {
-                maxi = i;
-            }
-        }
-        return nonPrettyJournalName.substring(0, maxi + 1);
+        return filePattern.matcher(nonPrettyJournalName).group();
     }
 
     public EntryPosition(String journalName, Long position, Long timestamp, Long serverId) {
