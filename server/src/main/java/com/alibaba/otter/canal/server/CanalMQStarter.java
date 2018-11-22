@@ -145,7 +145,9 @@ public class CanalMQStarter {
                     final long batchId = message.getId();
                     try {
                         int size = message.isRaw() ? message.getRawEntries().size() : message.getEntries().size();
+                        logger.info("batchid: {} size: {}",batchId,getBatchSize);
                         if (batchId != -1 && size != 0) {
+                            logger.info("before send");
                             canalMQProducer.send(destination, message, new CanalKafkaProducer.Callback() {
 
                                 @Override
@@ -158,9 +160,10 @@ public class CanalMQStarter {
                                     canalServer.rollback(clientIdentity, batchId);
                                 }
                             }); // 发送message到topic
+                            logger.info("after send");
                         } else {
                             try {
-                                Thread.sleep(100);
+                                Thread.sleep(1000);
                             } catch (InterruptedException e) {
                                 // ignore
                             }
