@@ -23,7 +23,7 @@ public class EntryPosition extends TimePosition {
     // add by agapple at 2016-06-28
     private Long serverId = null;              // 记录一下位点对应的serverId
     private String gtid = null;
-    Pattern filePattern = Pattern.compile("[^.]*\\.\\d+");
+    private Pattern filePattern = Pattern.compile("[^.]*\\.\\d+");
 
     public EntryPosition() {
         super(null);
